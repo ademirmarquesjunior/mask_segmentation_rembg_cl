@@ -1,6 +1,6 @@
 import os
-from shutil import copyfile
-import sys
+# from shutil import copyfile
+# import sys
 from PIL import Image
 import numpy as np
 import io
@@ -10,11 +10,11 @@ import argparse
 from tqdm import tqdm
 
 
-home_folder = os.path.expanduser('~')
+# home_folder = os.path.expanduser('~')
 
-if os.path.exists(os.path.join(str(home_folder) + '\.u2net')) == False:
-    os.makedirs(os.path.join(str(home_folder) + '\.u2net'))
-    copyfile(os.path.normpath(r'u2net.onnx'), os.path.normpath(home_folder + r'\.u2net\u2net.onnx'))
+# if os.path.exists(os.path.join(str(home_folder) + '\.u2net')) == False:
+#     os.makedirs(os.path.join(str(home_folder) + '\.u2net'))
+#     copyfile(os.path.normpath(r'u2net.onnx'), os.path.normpath(home_folder + r'\.u2net\u2net.onnx'))
 
 
 
