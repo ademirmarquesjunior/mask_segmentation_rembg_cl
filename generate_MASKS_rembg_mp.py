@@ -8,7 +8,7 @@ from rembg import remove
 
 import argparse
 from tqdm import tqdm
-from multiprocessing import Process
+from multiprocessing import Process, Pool
 
 
 # home_folder = os.path.expanduser('~')
@@ -45,9 +45,10 @@ def create_binary_mask(mask_image):
 
 class Create_mask():
 
-    def __init__(self, input_dir, output_dir, parent=None):
+    def __init__(self, input_dir, output_dir, processes, parent=None):
         self.input_dir = input_dir
         self.output_dir = output_dir
+        self.processes = processes
 
     def process(self):
         if not os.path.exists(self.output_dir):
@@ -55,17 +56,25 @@ class Create_mask():
 
         jpg_files = [f for f in os.listdir(self.input_dir) if f.lower().endswith('.jpg')]
 
-        processes = list()
+        # processes = list()
+        list_input = []
+        list_output = []
         for jpg_file in jpg_files:
             input_path = os.path.join(self.input_dir, jpg_file)
             mask_filename = os.path.splitext(jpg_file)[0] + "_mask.png"
             output_path = os.path.join(self.output_dir, mask_filename)
-            p = Process(target=parallel_core_function, args=(input_path, output_path))
-            processes.append(p)
-            p.start()
+            list_input.append(input_path)
+            list_output.append(output_path)
+            # p = Process(target=parallel_core_function, args=(input_path, output_path))
+            # processes.append(p)
+            # p.start()
 
-        for p in processes:
-            p.join()
+        # for p in processes:
+        #     p.join()
+
+        with Pool(self.processes) as p:
+            p.starmap(parallel_core_function, zip(list_input, list_output))
+
 
 
 if __name__ == '__main__':
@@ -77,14 +86,16 @@ if __name__ == '__main__':
 
     parser.add_argument('-i', '--inputfolder', required=True)
     parser.add_argument('-o', '--outputfolder', required=True)
+    parser.add_argument('-p', '--processes', default=8)
 
     args = parser.parse_args()
 
     try:
         input_folder = args.inputfolder
         output_folder = args.outputfolder
+        processes = int(args.processes)
 
-        mask_generator = Create_mask(input_folder, output_folder)
+        mask_generator = Create_mask(input_folder, output_folder, processes)
         mask_generator.process()
     except Exception as e:
         print('Error: ' + str(e))
